@@ -6,11 +6,9 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Home from "./pages/Home";
-import Admin from "./pages/Admin";
 import Contact from "./pages/Contact";
 import ThankYou from "./pages/ThankYou";
 import CheckIn from "./pages/CheckIn";
-import AttendeeTickets from "./pages/AttendeeTickets";
 import Header from "./components/Header";
 import WhatsAppFAB from "./components/WhatsAppFAB";
 import FreeTicketModal from "./components/FreeTicketModal";
@@ -20,11 +18,9 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/admin"} component={Admin} />
       <Route path={"/contact"} component={Contact} />
       <Route path={"/thankyou-page"} component={ThankYou} />
       <Route path={"/check-in"} component={CheckIn} />
-      <Route path={"/my-tickets"} component={AttendeeTickets} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
