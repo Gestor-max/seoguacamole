@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { trpc } from "@/lib/trpc";
+
 import { toast } from "sonner";
 import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 
@@ -26,22 +26,24 @@ export default function Contact() {
     };
   }, []);
 
-  const createContactMutation = trpc.contactForms.create.useMutation({
-    onSuccess: () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      // Simulate form submission (frontend only)
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success(t("contact.form.success"));
       setName("");
       setEmail("");
       setMessage("");
-    },
-    onError: (error) => {
+    } catch (error) {
       toast.error(t("contact.form.error"));
       console.error("Contact form error:", error);
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    createContactMutation.mutate({ name, email, message });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -123,11 +125,11 @@ export default function Contact() {
 
                   <Button
                     type="submit"
-                    disabled={createContactMutation.isPending}
+                    disabled={isSubmitting}
                     className="w-full bg-gradient-to-r from-green-400 to-cyan-400 hover:from-green-500 hover:to-cyan-500 text-black font-bold text-lg py-6"
                     style={{ fontFamily: "Montserrat" }}
                   >
-                    {createContactMutation.isPending
+                    {isSubmitting
                       ? t("contact.form.sending")
                       : t("contact.form.submit")}
                   </Button>

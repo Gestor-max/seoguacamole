@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
@@ -54,23 +53,6 @@ export default function TicketRegistrationModal({ open, onOpenChange, ticketType
 
   const ticketInfo = getTicketInfo();
 
-  // Stripe checkout mutation
-  const createCheckoutMutation = trpc.stripe.createCheckoutSession.useMutation({
-    onSuccess: (data) => {
-      if (data.checkoutUrl) {
-        // Redirect to Stripe checkout
-        window.open(data.checkoutUrl, '_blank');
-        toast.success(t("registration.redirectingToCheckout") || "Redirecting to checkout...");
-        setFormData({ name: "", email: "", phone: "", couponCode: "", currency: "USD", hearAboutUs: "" });
-        onOpenChange(false);
-      }
-    },
-    onError: (error: any) => {
-      toast.error(error.message || t("registration.error"));
-      setIsProcessing(false);
-    }
-  });
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -87,23 +69,19 @@ export default function TicketRegistrationModal({ open, onOpenChange, ticketType
     setIsProcessing(true);
 
     try {
-      // Create Stripe checkout session
-      await createCheckoutMutation.mutateAsync({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        ticketType: ticketInfo.type as "GENERAL_ADMISSION" | "VIRTUAL_ADMISSION",
-        couponCode: formData.couponCode || undefined,
-        currency: formData.currency,
-        hearAboutUs: formData.hearAboutUs
-      });
+      // Simulate checkout (frontend only)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success(t("registration.redirectingToCheckout") || "Registration submitted successfully!");
+      setFormData({ name: "", email: "", phone: "", couponCode: "", currency: "USD", hearAboutUs: "" });
+      onOpenChange(false);
     } catch (error) {
       console.error("Checkout error:", error);
+      toast.error(t("registration.error") || "An error occurred");
+      setIsProcessing(false);
+    } finally {
       setIsProcessing(false);
     }
   };
-
-  const isLoading = isProcessing || createCheckoutMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -245,10 +223,10 @@ export default function TicketRegistrationModal({ open, onOpenChange, ticketType
           ) : (
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isProcessing}
               className="w-full bg-gradient-to-r from-green-500 to-cyan-500 hover:from-green-600 hover:to-cyan-600 text-black font-bold py-6 text-lg"
             >
-              {isLoading ? (
+              {isProcessing ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   {t("modal.processing") || "Processing..."}

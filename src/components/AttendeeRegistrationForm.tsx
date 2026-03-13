@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,23 +11,25 @@ export default function AttendeeRegistrationForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createAttendeeMutation = trpc.attendees.create.useMutation({
-    onSuccess: () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      // Simulate form submission (frontend only)
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success(t("registration.success") || "Registration successful!");
       setName("");
       setEmail("");
       setPhone("");
-    },
-    onError: (error) => {
+    } catch (error) {
       toast.error(t("registration.error") || "Registration failed. Please try again.");
       console.error(error);
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    createAttendeeMutation.mutate({ name, email, phone: phone || undefined });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -77,10 +78,10 @@ export default function AttendeeRegistrationForm() {
         </div>
         <Button
           type="submit"
-          disabled={createAttendeeMutation.isPending}
+          disabled={isSubmitting}
           className="w-full bg-gradient-to-r from-green-500 to-cyan-500 hover:from-green-600 hover:to-cyan-600 text-black font-bold"
         >
-          {createAttendeeMutation.isPending
+          {isSubmitting
             ? (t("registration.submitting") || "Submitting...")
             : (t("registration.submit") || "Register Now")}
         </Button>

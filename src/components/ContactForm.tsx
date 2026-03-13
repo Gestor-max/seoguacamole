@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -13,23 +12,25 @@ export default function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createContactMutation = trpc.contactForms.create.useMutation({
-    onSuccess: () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      // Simulate form submission (frontend only)
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success(t("contact.success") || "Message sent successfully!");
       setName("");
       setEmail("");
       setMessage("");
-    },
-    onError: (error) => {
+    } catch (error) {
       toast.error(t("contact.error") || "Failed to send message. Please try again.");
       console.error(error);
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    createContactMutation.mutate({ name, email, message });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -79,10 +80,10 @@ export default function ContactForm() {
         </div>
         <Button
           type="submit"
-          disabled={createContactMutation.isPending}
+          disabled={isSubmitting}
           className="w-full bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-black font-bold"
         >
-          {createContactMutation.isPending
+          {isSubmitting
             ? (t("contact.submitting") || "Sending...")
             : (t("contact.submit") || "Send Message")}
         </Button>
